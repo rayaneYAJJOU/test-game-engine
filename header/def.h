@@ -9,6 +9,7 @@
 #define HEIGHT 720
 #define PI 3.1415926535897932384626433
 #define FRAMERATE 60
+#define MS_PER_FRAME (Uint32) 1000/FRAMERATE
 
 typedef enum EulerOrder {
     EULER_ORDER_XYZ = 0,
@@ -23,7 +24,9 @@ typedef enum ExitCode {
     SUCCESS = 0,
     INIT_FAIL = 1,
     WINDOW_FAIL = 2,
-    RENDERER_FAIL = 3
+    RENDERER_FAIL = 3,
+    GAME_FAIL = 4,
+    ENTITY_FAIL = 5
 } ExitCode;
 
 extern int exitCode;

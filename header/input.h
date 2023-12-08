@@ -5,7 +5,11 @@
 #include <stdio.h>
 
 #include "def.h"
+#include "handler.h"
+#include "particle.h"
+#include "vector3.h"
+#include "color.h"
 
-void HandleInput();
+void HandleInput(Game*);
 
 #endif

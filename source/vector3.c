@@ -11,7 +11,7 @@ const Vector3 Z_AXIS = (Vector3) {0.0, 0.0, 1.0};
 
 Vector3* CreateVect(float x, float y, float z) {
 
-    Vector3 *vect = malloc(sizeof(Vector3));
+    Vector3 *vect = (Vector3*)malloc(sizeof(Vector3));
 
     if (vect==NULL) {
         fprintf(stderr,"Error allocating memory for struct Vector3.\n");

@@ -19,7 +19,7 @@ Color YELLOW = (Color) {255, 255, 0, 255};
 
 Color *CreateColorRGBA(Uint8 r, Uint8 g, Uint8 b, Uint8 a) {
 
-    Color *color = malloc(sizeof(Uint8)*4);
+    Color *color = (Color*)malloc(sizeof(Uint8)*4);
 
     if (color == NULL) {
         fprintf(stderr,"Error allocating memory for struct Color.\n");

@@ -5,13 +5,16 @@
 #include <stdio.h>
 
 #include "def.h"
+#include "handler.h"
 #include "color.h"
 #include "vector3.h"
+#include "particle.h"
 
 extern SDL_Renderer *renderer;
+typedef struct Game Game;
 
-void *InitRenderer(SDL_Window*, int, Uint32);
+void InitRenderer(SDL_Window*, int, Uint32);
 void CloseRenderer();
-void Render();
+void Render(Game*);
 
 #endif

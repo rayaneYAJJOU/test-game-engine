@@ -1,23 +1,27 @@
 #include <stdio.h>
 #include <errno.h>
 #include <stdbool.h>
+#include <stdlib.h>
 #include <SDL2/SDL.h>
 
 #include "header/def.h"
+#include "header/handler.h"
 #include "header/input.h"
 #include "header/renderer.h"
 #include "header/timer.h"
 #include "header/window.h"
+#include "header/particle.h"
+#include "header/color.h"
 
 int main(int argc, char *argv[]) {
 
     InitWindow("Title", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, WIDTH, HEIGHT, SDL_WINDOW_OPENGL, SDL_INIT_EVERYTHING);
     InitRenderer(window, -1, SDL_RENDERER_ACCELERATED);
 
-    const Uint32 MS_PER_FRAME = (Uint32) 1000/FRAMERATE;
-
     Uint32 frameTime;
     Uint32 frameStart;
+
+    Game *game = InitGame(NULL, 0, renderer, window);
 
     while (running) {
 
@@ -27,11 +31,13 @@ int main(int argc, char *argv[]) {
 
         frameStart = SDL_GetTicks();
 
-        HandleInput();
+        HandleInput(game);
 
         UpdateDeltaTime();
 
-        Render();
+        CheckParticlesBound(game);
+
+        Render(game);
 
         frameTime = SDL_GetTicks() - frameStart;
         if (frameTime < MS_PER_FRAME) {
@@ -39,9 +45,7 @@ int main(int argc, char *argv[]) {
         }
     }
 
-    CloseRenderer();
-    CloseWindow();
-    SDL_Quit();
+    CloseGame(game);
 
     return exitCode;
 }
