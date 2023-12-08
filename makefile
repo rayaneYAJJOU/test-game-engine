@@ -1,2 +1,11 @@
-all:
-	gcc -o main main.c source/particle.c source/color.c source/def.c source/handler.c source/input.c source/matrix.c source/quaternion.c source/renderer.c source/timer.c source/vector3.c source/window.c -lmingw32 -lSDL2main -lSDL2
+SRC_DIR := src
+SUB_DIRS := $(wildcard $(SRC_DIR)/*/)
+SRC_FILES := $(wildcard $(addsuffix *.c,$(SUB_DIRS))) src/game.c main.c
+
+all: main
+
+main: $(SRC_FILES)
+	gcc -o $@ $^ -lmingw32 -lSDL2main -lSDL2
+
+clean:
+	rm -f main
