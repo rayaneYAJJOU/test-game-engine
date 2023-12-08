@@ -28,6 +28,7 @@ void UpdateGame(Game *game, float delta) {
     }
 
     for (int i=0; i<game->numParticles; i++) {
+        ApplyForce(*(game->particleArr+i), (Vector3){0.0f, 50.0f*(*(game->particleArr+i))->mass, 0.0f}, delta);
         UpdateParticle(*(game->particleArr+i), delta);
     }
 }
@@ -102,16 +103,32 @@ void CloseGame(Game *game) {
 
 void AddParticle(Game *game, Particle *p) {
 
-    Particle **pArr = (Particle**)realloc(game->particleArr, sizeof(Particle*)*(game->numParticles++));
+    //Particle **pArr = (Particle**)realloc(game->particleArr, sizeof(Particle*)*(game->numParticles++));
+    //Particle **pArr = (Particle**)malloc(sizeof(Particle*)*(game->numParticles++));
+    game->particleArr = (Particle**)realloc(game->particleArr, sizeof(Particle*)*(++game->numParticles));
 
-    if (pArr == NULL) {
+    if (game->particleArr == NULL) {
         fprintf(stderr,"Error reallocating memory for new particle.\n");
         exitCode = ENTITY_FAIL;
         return;
     }
 
-    *(pArr + game->numParticles-1) = p;
-    game->particleArr = pArr;
+    /*
+    for (int i=0;i<game->numParticles-1;i++) {
+        *(pArr+i) = *(game->particleArr+i);
+        DestroyParticle(*(game->particleArr+i));
+    }
+
+    free(game->particleArr);
+
+    if (game->particleArr != NULL) {
+        fprintf(stderr,"Error freeing memory for particle array.\n");
+        exitCode = ENTITY_FAIL;
+        return;
+    }
+    */
+
+    *(game->particleArr + game->numParticles-1) = p;
 }
 
 void RemoveParticle(Game *game, Particle *p) {
@@ -131,7 +148,7 @@ void RemoveParticle(Game *game, Particle *p) {
         }
     }
     
-    Particle **pArr = (Particle**)realloc(game->particleArr, sizeof(Particle*)*(game->numParticles-1));
+    Particle **pArr = (Particle**)realloc(game->particleArr, sizeof(Particle*)*(game->numParticles--));
 
     if (pArr == NULL) {
         fprintf(stderr,"Error reallocating memory for new particle.\n");

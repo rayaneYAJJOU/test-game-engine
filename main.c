@@ -35,6 +35,8 @@ int main(int argc, char *argv[]) {
 
         UpdateDeltaTime();
 
+        UpdateGame(game, GetDeltaTime());
+
         CheckParticlesBound(game);
 
         Render(game);

@@ -13,6 +13,7 @@ Particle *CreateParticle(float mass, Vector3 pos, Color c) {
     p->mass = mass;
     p->position = pos;
     p->velocity = ZERO_VECTOR;
+    p->acceleration = ZERO_VECTOR;
     p->color = c;
 
     return p;
@@ -20,9 +21,9 @@ Particle *CreateParticle(float mass, Vector3 pos, Color c) {
 
 void UpdateParticle(Particle *p, float delta) {
 
-    p->position.x += p->velocity.x*delta;
-    p->position.y += p->velocity.y*delta;
-    p->position.z += p->velocity.z*delta;
+    p->position.x += p->velocity.x*delta + 0.5f*p->acceleration.x*delta*delta;
+    p->position.y += p->velocity.y*delta + 0.5f*p->acceleration.y*delta*delta;
+    p->position.z += p->velocity.z*delta + 0.5f*p->acceleration.z*delta*delta;
 }
 
 void RenderParticle(SDL_Renderer *renderer, Particle *p) {
@@ -44,4 +45,15 @@ void DestroyParticle(Particle *p) {
     if (p != NULL) {
         free(p);
     }
+}
+
+void ApplyForce(Particle *p, Vector3 force, float delta) {
+
+    p->acceleration.x = (1/p->mass)*force.x;
+    p->acceleration.y = (1/p->mass)*force.y;
+    p->acceleration.z = (1/p->mass)*force.z;
+
+    p->velocity.x += p->acceleration.x*delta;
+    p->velocity.y += p->acceleration.y*delta;
+    p->velocity.z += p->acceleration.z*delta;
 }

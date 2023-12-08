@@ -14,6 +14,7 @@ typedef struct Particle {
     float mass;
     Vector3 position;
     Vector3 velocity;
+    Vector3 acceleration;
     Color color;
 } Particle;
 
@@ -22,5 +23,6 @@ void UpdateParticle(Particle*, float);
 void RenderParticle(SDL_Renderer*, Particle*);
 void InputParticle(SDL_Event, Particle*);
 void DestroyParticle(Particle*);
+void ApplyForce(Particle*, Vector3, float);
 
 #endif
