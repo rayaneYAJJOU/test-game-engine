@@ -124,11 +124,13 @@ void CloseGame(Game *game) {
         return;
     }
 
+    /*
     if (game->renderer==NULL) {
         fprintf(stderr,"Error closing game: renderer is not properly initialized.\n");
         exitCode = RENDERER_FAIL;
         return;
     }
+    */
 
     if (game->window==NULL) {
         fprintf(stderr,"Error closing game: window is not properly initialized.\n");
