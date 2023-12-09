@@ -21,8 +21,5 @@ void HandleInput(Game *game) {
             holdingMB1 = (e.button.button==SDL_BUTTON_LEFT) ? false: holdingMB1;
             break;
         }
-        if (holdingMB1) {
-            AddParticle(game, CreateParticle(1.0f, (Vector3){e.button.x, e.button.y, 0.0f}, RED));
-        }
     }
 }

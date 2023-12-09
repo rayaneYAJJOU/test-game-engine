@@ -40,4 +40,6 @@ Color LerpColor(Color, Color, float);
 Color fromHSV(float, float, float);
 Color InverseColor(Color);
 
+void PrintColor(Color);
+
 #endif

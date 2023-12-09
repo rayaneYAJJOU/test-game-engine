@@ -12,8 +12,8 @@ Particle *CreateParticle(float mass, Vector3 pos, Color c) {
 
     p->mass = mass;
     p->position = pos;
-    p->velocity = ZERO_VECTOR;
-    p->acceleration = ZERO_VECTOR;
+    p->velocity = ZERO_VECTOR3;
+    p->acceleration = ZERO_VECTOR3;
     p->color = c;
 
     return p;

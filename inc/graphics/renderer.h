@@ -5,10 +5,7 @@
 #include <stdio.h>
 
 #include "../game.h"
-#include "../physics/particle.h"
-#include "../utils/color.h"
 #include "../utils/def.h"
-#include "../utils/vector3.h"
 
 extern SDL_Renderer *renderer;
 typedef struct Game Game;

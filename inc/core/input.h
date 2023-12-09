@@ -6,10 +6,7 @@
 #include <stdbool.h>
 
 #include "../game.h"
-#include "../physics/particle.h"
-#include "../utils/color.h"
 #include "../utils/def.h"
-#include "../utils/vector3.h"
 
 extern bool holdingMB1;
 

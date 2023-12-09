@@ -3,7 +3,7 @@
 
 Game *InitGame(Particle **particleArr, Uint32 particleNum, SDL_Renderer *renderer, SDL_Window *window) {
 
-    Game *game = (Game*)malloc(sizeof(Particle**) + sizeof(Uint32) + sizeof(SDL_Renderer*) + sizeof(SDL_Window*));
+    Game *game = (Game*)malloc(sizeof(Game));
 
     if (game == NULL) {
         fprintf(stderr,"Error initializing game: memory was not properly allocated.\n");

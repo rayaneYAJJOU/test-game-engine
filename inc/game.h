@@ -1,10 +1,6 @@
 #ifndef HANDLER_H_
 #define HANDLER_H_
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <stdint.h>
-
 #include "core/input.h"
 #include "core/timer.h"
 #include "core/window.h"

@@ -70,3 +70,9 @@ Color InverseColor(Color c) {
     
     return (Color) {255-c.r, 255-c.g, 255-c.b, c.a};
 }
+
+
+void PrintColor(Color c) {
+
+    printf("struct Color: (%hu, %hu, %hu, %hu)\n", c.r, c.g, c.b, c.a);
+}

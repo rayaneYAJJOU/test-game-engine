@@ -1,12 +1,6 @@
 #ifndef QUATERNION_H_
 #define QUATERNION_H_
 
-#include <math.h>
-#include <assert.h>
-#include <stdbool.h>
-#include <stdlib.h>
-#include <stdio.h>
-
 #include "def.h"
 #include "vector3.h"
 

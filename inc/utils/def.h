@@ -4,6 +4,11 @@
 #include <stdarg.h>
 #include <assert.h>
 #include <stdbool.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <stdint.h>
+#include <string.h>
+#include <math.h>
 
 #define WIDTH 1080
 #define HEIGHT 720
@@ -36,8 +41,16 @@ extern bool running;
 
 float DegreesToRadians(float);
 float RadiansToDegrees(float);
+float q_rsqrt(float);
 float Maximum(int, ...);
 float Minimum(int, ...);
+float Sum(int, ...);
+float Prod(int, ...);
 float Lerp(float, float, float);
+float SumArray(int, float*);
+float *ProductArrays(int, float*, float*);
+float *SumArrays(int, float*, float*);
+
+bool IsZeroF(float);
 
 #endif
