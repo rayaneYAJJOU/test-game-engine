@@ -1,7 +1,7 @@
 #ifndef VECTOR3_H_
 #define VECTOR3_H_
 
-#include "def.h"
+#include "vector2.h"
 
 typedef struct Vector3 {
     float x;
@@ -19,7 +19,6 @@ Vector3* CreateVect3(float, float, float);
 void DestroyVect3(Vector3*);
 
 float *Vect3ToArray(Vector3);
-float *Vect4ToArray(Vector3, float);
 
 Vector3 AddVect3(Vector3, Vector3);
 Vector3 MultiplyVect3Scalar(Vector3, float);
@@ -31,6 +30,10 @@ Vector3 CrossProductVect3(Vector3, Vector3);
 Vector3 DirectionVect3(Vector3, Vector3);
 Vector3 BounceVect3(Vector3, Vector3);
 Vector3 ReflectVect3(Vector3, Vector3);
+Vector3 ProjectVect3(Vector3, Vector3);
+Vector3 ArrayToVect3(float[3]);
+Vector3 FromVect2(Vector2);
+Vector3 CrossProductVect2(Vector2, Vector2);
 
 float DotProductVect3(Vector3, Vector3);
 float MagnitudeSquaredVect3(Vector3);

@@ -5,6 +5,17 @@ const Vector2 ONE_VECTOR2 = (Vector2) {1.0f, 1.0f};
 const Vector2 X_AXIS2 = (Vector2) {1.0f, 0.0f};
 const Vector2 Y_AXIS2 = (Vector2) {0.0f, 1.0f};
 
+
+float *Vect2ToArray(Vector2 vect) {
+
+    static float arr[2];
+    arr[0] = vect.x;
+    arr[1] = vect.y;
+
+    return arr;
+}
+
+
 Vector2* CreateVect2(float x, float y) {
 
     Vector2 *vect = (Vector2*)malloc(sizeof(Vector2));
@@ -19,36 +30,12 @@ Vector2* CreateVect2(float x, float y) {
 
     return vect;
 }
+
 void DestroyVect2(Vector2* vect) {
 
     if (vect != NULL) {
         free(vect);
     }
-}
-
-float *Vect2ToArray(Vector2 vect) {
-
-    float *arr = (float*)malloc(sizeof(float)*2);
-
-    if (arr == NULL) {
-        fprintf(stderr,"Error allocating memory for array for Vector2.\n");
-        return NULL;
-    }
-
-    *arr = vect.x;
-    *(arr+1) = vect.y;
-
-    return arr;
-}
-
-Vector3 ToVect3(Vector2 vect) {
-
-    return (Vector3) {vect.x, vect.y, 0.0f};
-}
-
-Vector3 CrossProductVect2(Vector2 vect1, Vector2 vect2) {
-
-    return CrossProductVect3(ToVect3(vect1), ToVect3(vect2));
 }
 
 
@@ -101,6 +88,20 @@ Vector2 BounceVect2(Vector2 vect, Vector2 normal) {
 Vector2 ReflectVect2(Vector2 vect, Vector2 dir) {
 
     return BounceVect2(vect, RotateVect2(dir, PI/2));
+}
+
+Vector2 ProjectVect2(Vector2 vect, Vector2 on) {
+
+    if (IsZeroF(MagnitudeSquaredVect2(on))) {
+        return ZERO_VECTOR2;
+    }
+    
+    return MultiplyVect2Scalar(on, DotProductVect2(vect, on));
+}
+
+Vector2 ArrayToVect2(float arr[2]) {
+
+    return (Vector2) {arr[0], arr[1]};
 }
 
 

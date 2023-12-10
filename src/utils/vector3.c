@@ -3,38 +3,18 @@
 
 const Vector3 ZERO_VECTOR3 = (Vector3) {0.0f, 0.0f, 0.0f};
 const Vector3 ONE_VECTOR3 = (Vector3) {1.0f, 1.0f, 1.0f};
-const Vector3 X_AXIS3 = (Vector3) {1.0f, 0.0f, 1.0f};
+const Vector3 X_AXIS3 = (Vector3) {1.0f, 0.0f, 0.0f};
 const Vector3 Y_AXIS3 = (Vector3) {0.0f, 1.0f, 0.0f};
 const Vector3 Z_AXIS3 = (Vector3) {0.0f, 0.0f, 1.0f};
 
 
 float *Vect3ToArray(Vector3 vect) {
 
-    float *arr = (float*)malloc(sizeof(float)*3);
+    static float arr[3];
 
-    if (arr == NULL) {
-        fprintf(stderr,"Error allocating memory for array for vector.\n");
-        return NULL;
-    }
-
-    *arr = vect.x;
-    *(arr+1) = vect.y;
-    *(arr+2) = vect.z;
-
-    return arr;
-}
-
-float *Vect4ToArray(Vector3 vect, float w) {
-
-    float *arr = Vect3ToArray(vect);
-    arr = (float*)realloc(arr, sizeof(float)*4);
-
-    if (arr == NULL) {
-        fprintf(stderr,"Error reallocating memory for array for Vector3.\n");
-        return NULL;
-    }
-
-    *(arr+3) = w;
+    arr[0] = vect.x;
+    arr[1] = vect.y;
+    arr[2] = vect.z;
 
     return arr;
 }
@@ -78,6 +58,11 @@ Vector3 MultiplyVect3Scalar(Vector3 vect, float k) {
 Vector3 RotateVect3(Vector3 vect, Vector3 axis, float angle) {
 
     Vector3 axisNormalized = NormalizedVect3(axis);
+
+    if (IsZeroVect3(axisNormalized)) {
+        return ZERO_VECTOR3;
+    }
+
     float a = axisNormalized.x;
     float b = axisNormalized.y;
     float c = axisNormalized.z;
@@ -86,9 +71,9 @@ Vector3 RotateVect3(Vector3 vect, Vector3 axis, float angle) {
     float z = vect.z;
 
     return (Vector3) {
-        x*(cos(angle) + pow(a,2.0)*(1-cos(angle))) + y*(a*b*(1-cos(angle)) - c*sin(angle)) + z*(a*c*(1-cos(angle)) + b*sin(angle)),
-        x*(a*b*(1-cos(angle)) + c*sin(angle)) + y*(cos(angle) + pow(b,2.0)*(1-cos(angle))) + z*(b*c*(1-cos(angle)) - a*sin(angle)),
-        x*(a*c*(1-cos(angle)) - b*sin(angle)) + y*(b*c*(1-cos(angle)) + a*sin(angle)) + z*(cos(angle) + pow(c,2.0)*(1-cos(angle)))
+        x*(cos(angle) + a*a*(1-cos(angle))) + y*(a*b*(1-cos(angle)) - c*sin(angle)) + z*(a*c*(1-cos(angle)) + b*sin(angle)),
+        x*(a*b*(1-cos(angle)) + c*sin(angle)) + y*(cos(angle) + b*b*(1-cos(angle))) + z*(b*c*(1-cos(angle)) - a*sin(angle)),
+        x*(a*c*(1-cos(angle)) - b*sin(angle)) + y*(b*c*(1-cos(angle)) + a*sin(angle)) + z*(cos(angle) + c*c*(1-cos(angle)))
     };
 }
 
@@ -135,6 +120,30 @@ Vector3 BounceVect3(Vector3 vect, Vector3 normal) {
 Vector3 ReflectVect3(Vector3 vect, Vector3 dir) {
 
     return BounceVect3(vect, RotateVect3(dir, CrossProductVect3(dir, vect), PI/2));
+}
+
+Vector3 ProjectVect3(Vector3 vect, Vector3 on) {
+
+    if (IsZeroF(MagnitudeSquaredVect3(on))) {
+        return ZERO_VECTOR3;
+    }
+
+    return MultiplyVect3Scalar(on, DotProductVect3(vect, on)/MagnitudeSquaredVect3(on));
+}
+
+Vector3 ArrayToVect3(float arr[3]) {
+
+    return (Vector3) {arr[0], arr[1], arr[2]};
+}
+
+Vector3 FromVect2(Vector2 vect) {
+
+    return (Vector3) {vect.x, vect.y, 0.0f};
+}
+
+Vector3 CrossProductVect2(Vector2 vect1, Vector2 vect2) {
+
+    return CrossProductVect3(FromVect2(vect1), FromVect2(vect2));
 }
 
 

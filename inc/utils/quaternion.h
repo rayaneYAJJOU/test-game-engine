@@ -12,6 +12,8 @@ typedef struct Quaternion {
     float w;
 } Quaternion;
 
+typedef struct Matrix4 Matrix4;
+
 extern const Quaternion IDENTITY_QUAT;
 extern const Quaternion ZERO_QUAT;
 
@@ -24,22 +26,37 @@ Quaternion MultiplyQuat(Quaternion, Quaternion);
 Quaternion AdditiveInverseQuat(Quaternion);
 Quaternion ConjugateQuat(Quaternion);
 Quaternion InverseQuat(Quaternion);
+Quaternion GetRotationQuat(Vector3, float);
 Quaternion FromEulerAnglesQuat(Vector3, EulerOrder);
 Quaternion NormalizedQuat(Quaternion);
 Quaternion LerpQuat(Quaternion, float);
+Quaternion FromVect3Quat(Vector3);
+Quaternion FromScalarQuat(float);
+Quaternion ExpQuat(Quaternion);
+Quaternion LogQuat(Quaternion);
+Quaternion MultiplyQuatVect3(Quaternion, Vector3);
+Quaternion MultiplyVect3Quat(Vector3, Quaternion);
 
 Matrix4 GetMatrix4Quat(Quaternion);
 
 Vector3 GetEulerAnglesQuat(Quaternion, EulerOrder);
+Vector3 GetVect3PartQuat(Quaternion);
+Vector3 RotateVect3Quat(Vector3, Vector3, float);
+Vector3 GetAxisQuat(Quaternion);
 
+float DotProductQuat(Quaternion, Quaternion);
 float AngleQuat(Quaternion, Quaternion);
 float MagnitudeSquaredQuat(Quaternion);
 float MagnitudeQuat(Quaternion);
 float DistanceSquaredQuat(Quaternion, Quaternion);
 float DistanceQuat(Quaternion, Quaternion);
+float GetScalarPartQuat(Quaternion);
+float GetAngleQuat(Quaternion);
 
 bool IsZeroQuat(Quaternion);
 bool EqualQuat(Quaternion, Quaternion);
 bool IsNormalizedQuat(Quaternion);
+
+void PrintQuat(Quaternion);
 
 #endif
