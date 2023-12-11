@@ -48,8 +48,12 @@ float Sum(int, ...);
 float Prod(int, ...);
 float Lerp(float, float, float);
 float SumArray(int, float*);
-float *ProductArrays(int, float*, float*);
-float *SumArrays(int, float*, float*);
+float *ProductArrays(uint32_t, float*, float*);
+float *SumArrays(uint32_t, float*, float*);
+float *GetRootsPol2(float, float);
+float *GetRootsPol3(float, float, float);
+double arcsinex(double);
+double arccosinex(double);
 
 bool IsZeroF(float);
 

@@ -149,6 +149,11 @@ Matrix2 ScaleMat2(Matrix2 mat, Vector2 scale) {
     return MultiplyMat2(mat, scalv);
 }
 
+Matrix2 ScalarMat2(float k) {
+
+    return MultiplyMat2Scalar(IDENTITY_MAT2, k);
+}
+
 
 Vector2 *GetMat2Columns(Matrix2 mat) {
 
@@ -173,6 +178,12 @@ Vector2 MultiplyMat2Vect2(Matrix2 mat, Vector2 vect) {
 }
 
 
+float *GetEigenValMat2(Matrix2 mat) {
+
+    return GetRootsPol2(-TraceMat2(mat), DeterminantMat2(mat));
+}
+
+
 float TraceMat2(Matrix2 mat) {
 
     return mat.matrix[0][0] + mat.matrix[1][1];
@@ -186,6 +197,11 @@ float DeterminantMat2(Matrix2 mat) {
 float GetAngleMat2(Matrix2 mat) {
 
     return acos(TraceMat2(mat)/2);
+}
+
+float CharPolMat2(Matrix2 mat, float lambda) {
+
+    return lambda*lambda - TraceMat2(mat)*lambda + DeterminantMat2(mat);
 }
 
 

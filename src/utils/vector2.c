@@ -138,7 +138,7 @@ float DistanceVect2(Vector2 from, Vector2 to) {
 
 bool IsZeroVect2(Vector2 vect) {
 
-    return fabs(vect.x) < 10e-6 && fabs(vect.y) < 10e-6;
+    return fabs(vect.x) < 1e-6 && fabs(vect.y) < 1e-6;
 }
 
 bool EqualVect2(Vector2 vect1, Vector2 vect2) {

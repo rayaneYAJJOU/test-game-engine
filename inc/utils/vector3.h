@@ -41,6 +41,7 @@ float MagnitudeVect3(Vector3);
 float AngleVect3(Vector3, Vector3);
 float DistanceSquaredVect3(Vector3, Vector3);
 float DistanceVect3(Vector3, Vector3);
+float TripleProductVect3(Vector3, Vector3, Vector3);
 
 bool IsZeroVect3(Vector3);
 bool EqualVect3(Vector3, Vector3);

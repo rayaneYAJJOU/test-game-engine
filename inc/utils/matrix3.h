@@ -27,15 +27,19 @@ Matrix3 OrthonormalizeMat3(Matrix3);
 Matrix3 Mat3FromVect3(Vector3, Vector3, Vector3);
 Matrix3 RotateMat3(Matrix3, Vector3, float);
 Matrix3 ScaleMat3(Matrix3, Vector3);
+Matrix3 ScalarMat3(float);
 
 Vector3 MultiplyMat3Vect3(Matrix3, Vector3);
 Vector3 GetEulerAnglesMat3(Matrix3, EulerOrder);
 
 Vector3 *GetMat3Columns(Matrix3);
 
+float *GetEigenValMat3(Matrix3);
+
 float TraceMat3(Matrix3);
 float DeterminantMat3(Matrix3);
 float GetAngleMat3(Matrix3);
+float CharPolMat3(Matrix3, float);
 
 bool IsOrthogonalMat3(Matrix3);
 bool IsZeroMat3(Matrix3);

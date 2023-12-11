@@ -111,7 +111,7 @@ float SumArray(int size, float *arr) {
     return sum;
 }
 
-float *ProductArrays(int size, float *arr1, float *arr2) {
+float *ProductArrays(uint32_t size, float *arr1, float *arr2) {
 
     float *prod = (float*)malloc(sizeof(float)*size);
     
@@ -128,7 +128,7 @@ float *ProductArrays(int size, float *arr1, float *arr2) {
     return prod;
 }
 
-float *SumArrays(int size, float *arr1, float *arr2) {
+float *SumArrays(uint32_t size, float *arr1, float *arr2) {
 
     float *sum = (float*)malloc(sizeof(float)*size);
 
@@ -145,8 +145,108 @@ float *SumArrays(int size, float *arr1, float *arr2) {
     return sum;
 }
 
+float *GetRootsPol2(float a1, float a0) {
+
+    float delta = a1*a1 - 4*a0;
+
+    float *roots = NULL;
+
+    if (IsZeroF(delta)) {
+
+        roots = (float*)malloc(sizeof(float));
+        
+        if (roots == NULL) {
+            fprintf(stderr,"Error allocating memory for GetRootsPol2.\n");
+            return NULL;
+        }
+
+        *roots = -a1*0.5f;
+    } else if (delta > 0.0f) {
+
+        roots = (float*)malloc(sizeof(float)*2);
+
+        if (roots == NULL) {
+            fprintf(stderr,"Error allocating memory for GetRootsPol2.\n");
+            return NULL;
+        }
+
+        delta = sqrt(delta);
+        *roots = 0.5f*(-a1 + delta);
+        *(roots+1) = 0.5f*(-a1 - delta);
+    }
+
+    return roots;
+}
+
+float *GetRootsPol3(float a2, float a1, float a0) {
+
+    float *roots = NULL;
+
+    float oneThird = 0.33333333333333333f;
+    float oneNinth = 0.11111111111111111f;
+    float oneSixth = 0.16666666666666666f;
+    float one27 = 0.037037037037037037f;
+
+    float q = a1*oneThird - a2*a2*oneNinth;
+    float r = (a1*a2 - 3*a0)*oneSixth - a2*a2*a2*one27;
+
+    float dec = r*r + q*q*q;
+
+    float A = cbrt(fabs(r) + sqrt(dec));
+
+    float t = A - q*(1/A);
+    t = (r >= 0.0f) ? t : -t;
+
+    float z0 = t - a2*oneThird;
+
+    if (dec > 0.0f) {
+
+        roots = (float*)malloc(sizeof(float));
+
+        if (roots == NULL) {
+            fprintf(stderr,"Error allocating memory for GetRootsPol2.\n");
+            return NULL;
+        }
+
+        *roots = z0;
+    } else {
+
+        roots = (float*)malloc(sizeof(float)*3);
+
+        if (roots == NULL) {
+            fprintf(stderr,"Error allocating memory for GetRootsPol2.\n");
+            return NULL;
+        }
+
+        float *r2 = GetRootsPol2(z0+a2, z0*(z0+a2) + a1);
+
+        *roots = z0;
+        *(roots+1) = *r2;
+        *(roots+2) = *(r2+1);
+
+        free(r2);
+    }
+
+    return roots;
+}
+
+double arcsinex(double x) {
+
+    return asin(fmod(x, 1));
+}
+
+double arccosinex(double x) {
+
+    return acos(fmod(x, 1));
+}
+
 
 bool IsZeroF(float x) {
 
-    return fabs(x) < 10e-6;
+    return fabs(x) < 1e-6;
+}
+
+bool IsZeroD(double x) {
+
+    return fabs(x) < 1e-15;
 }

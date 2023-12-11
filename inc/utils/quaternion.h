@@ -2,7 +2,7 @@
 #define QUATERNION_H_
 
 #include "def.h"
-#include "vector3.h"
+#include "vector4.h"
 #include "matrix4.h"
 
 typedef struct Quaternion {
@@ -26,7 +26,7 @@ Quaternion MultiplyQuat(Quaternion, Quaternion);
 Quaternion AdditiveInverseQuat(Quaternion);
 Quaternion ConjugateQuat(Quaternion);
 Quaternion InverseQuat(Quaternion);
-Quaternion GetRotationQuat(Vector3, float);
+Quaternion RotationQuat(Vector3, float);
 Quaternion FromEulerAnglesQuat(Vector3, EulerOrder);
 Quaternion NormalizedQuat(Quaternion);
 Quaternion LerpQuat(Quaternion, float);
@@ -36,8 +36,12 @@ Quaternion ExpQuat(Quaternion);
 Quaternion LogQuat(Quaternion);
 Quaternion MultiplyQuatVect3(Quaternion, Vector3);
 Quaternion MultiplyVect3Quat(Vector3, Quaternion);
+Quaternion RotateQuat(Quaternion, Vector3, float);
+Quaternion GetQuatMat3(Matrix3);
 
-Matrix4 GetMatrix4Quat(Quaternion);
+Matrix4 GetMat4Quat(Quaternion);
+
+Matrix3 GetMat3Quat(Quaternion);
 
 Vector3 GetEulerAnglesQuat(Quaternion, EulerOrder);
 Vector3 GetVect3PartQuat(Quaternion);

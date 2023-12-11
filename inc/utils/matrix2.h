@@ -26,14 +26,18 @@ Matrix2 Mat2FromVect2(Vector2, Vector2);
 Matrix2 OrthonormalizeMat2(Matrix2);
 Matrix2 RotateMat2(Matrix2, float);
 Matrix2 ScaleMat2(Matrix2, Vector2);
+Matrix2 ScalarMat2(float);
 
 Vector2 MultiplyMat2Vect2(Matrix2, Vector2);
 
 Vector2 *GetMat2Columns(Matrix2);
 
+float *GetEigenValMat2(Matrix2);
+
 float TraceMat2(Matrix2);
 float DeterminantMat2(Matrix2);
 float GetAngleMat2(Matrix2);
+float CharPolMat2(Matrix2, float);
 
 bool IsOrthogonalMat2(Matrix2);
 bool IsZeroMat2(Matrix2);

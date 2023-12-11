@@ -178,11 +178,16 @@ float DistanceVect3(Vector3 from, Vector3 to) {
     return sqrt(DistanceSquaredVect3(from, to));
 }
 
+float TripleProductVect3(Vector3 vect1, Vector3 vect2, Vector3 vect3) {
+
+    return DotProductVect3(vect1, CrossProductVect3(vect2, vect3));
+}
+
 
 
 bool IsZeroVect3(Vector3 vect) {
 
-    return fabs(vect.x) < 10e-6 && fabs(vect.y) < 10e-6 && fabs(vect.z) < 10e-6;
+    return fabs(vect.x) < 1e-6 && fabs(vect.y) < 1e-6 && fabs(vect.z) < 1e-6;
 }
 
 bool EqualVect3(Vector3 vect1, Vector3 vect2) {

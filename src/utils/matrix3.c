@@ -1,7 +1,7 @@
 #include "../../inc/utils/matrix3.h"
 
 
-const Matrix3 IDENTITY_MAT3 = (Matrix3){{{1.0f, 0.0f, 1.0f}, {0.0f, 1.0f, 0.0f}, {0.0f, 0.0f, 1.0f}}};
+const Matrix3 IDENTITY_MAT3 = (Matrix3){{{1.0f, 0.0f, 0.0f}, {0.0f, 1.0f, 0.0f}, {0.0f, 0.0f, 1.0f}}};
 const Matrix3 ZERO_MAT3 = (Matrix3){{{0.0f, 0.0f, 0.0f}, {0.0f, 0.0f, 0.0f}, {0.0f, 0.0f, 0.0f}}};
 const Matrix3 ONE_MAT3 = (Matrix3){{{1.0f, 1.0f, 1.0f}, {1.0f, 1.0f, 1.0f}, {1.0f, 1.0f, 1.0f}}};
 
@@ -102,7 +102,7 @@ Matrix3 InverseMat3(Matrix3 mat) {
     return MultiplyMat3Scalar((Matrix3){{{cof11, cof12, cof13},{cof21, cof22, cof23},{cof31, cof32, cof33}}}, 1/DeterminantMat3(mat));
 }
 /*
-Matrix3 RotationMat3X(float angle) {
+Matrix3 RotationMat3Z(float angle) {
 
     return (Matrix3) {{
         {cos(angle), -sin(angle), 0.0f},
@@ -114,13 +114,13 @@ Matrix3 RotationMat3X(float angle) {
 Matrix3 RotationMat3Y(float angle) {
 
     return (Matrix3) {{
-        {cos(angle), 0.0f, -sin(angle)},
+        {cos(angle), 0.0f, sin(angle)},
         {0.0f, 1.0f, 0.0f},
-        {sin(angle), 0.0f, cos(angle)}
+        {-sin(angle), 0.0f, cos(angle)}
     }};
 }
 
-Matrix3 RotationMat3Z(float angle) {
+Matrix3 RotationMat3X(float angle) {
 
     return (Matrix3) {{
         {1.0f, 0.0f, 0.0f},
@@ -132,49 +132,62 @@ Matrix3 RotationMat3Z(float angle) {
 
 Matrix3 RotationMat3(Vector3 axis, float angle) {
 
-    Vector3 axisNormalized = NormalizedVect3(axis);
+    if (!IsNormalizedVect3(axis)) {
+        return ZERO_MAT3;
+    }
     float a = axis.x;
     float b = axis.y;
     float c = axis.z;
+    float ca = cos(angle);
+    float sa = sin(angle);
 
     return (Matrix3) {{
-        {cos(angle) + a*a*(1-cos(angle)), a*b*(1-cos(angle)) - c*sin(angle), a*c*(1-cos(angle)) + b*sin(angle)},
-        {a*b*(1-cos(angle)) + c*sin(angle), cos(angle) + b*b*(1-cos(angle)), b*c*(1-cos(angle)) - a*sin(angle)},
-        {a*c*(1-cos(angle)) - b*sin(angle), b*c*(1-cos(angle)) + a*sin(angle), cos(angle) + c*c*(1-cos(angle))}
+        {ca + a*a*(1-ca), a*b*(1-ca) - c*sa, a*c*(1-ca) + b*sa},
+        {a*b*(1-ca) + c*sa, ca + b*b*(1-ca), b*c*(1-ca) - a*sa},
+        {a*c*(1-ca) - b*sa, b*c*(1-ca) + a*sa, ca + c*c*(1-ca)}
     }};
 }
 
 
-Matrix3 FromEulerAnglesMat4(Vector3 eulerAngles, EulerOrder order) {
+Matrix3 FromEulerAnglesMat3(Vector3 eulerAngles, EulerOrder order) {
 
     float x = eulerAngles.x;
     float y = eulerAngles.y;
     float z = eulerAngles.z;
 
-    Matrix3 RX = RotationMat3(X_AXIS3, x);
-    Matrix3 RY = RotationMat3(Y_AXIS3, y);
-    Matrix3 RZ = RotationMat3(Z_AXIS3, z);
-    Matrix3 R = ZERO_MAT3;
+    Matrix3 R = IDENTITY_MAT3;
 
     switch (order)
     {
     case EULER_ORDER_XYZ:
-        R = MultiplyMat3(RZ, MultiplyMat3(RY, RX));
+        R = RotateMat3(R, Z_AXIS3, z);
+        R = RotateMat3(R, Y_AXIS3, y);
+        R = RotateMat3(R, X_AXIS3, x);
         break;
     case EULER_ORDER_XZY:
-        R = MultiplyMat3(RY, MultiplyMat3(RZ, RX));
+        R = RotateMat3(R, Y_AXIS3, y);
+        R = RotateMat3(R, Z_AXIS3, z);
+        R = RotateMat3(R, X_AXIS3, x);
         break;
     case EULER_ORDER_YXZ:
-        R = MultiplyMat3(RZ, MultiplyMat3(RX, RY));
+        R = RotateMat3(R, Z_AXIS3, z);
+        R = RotateMat3(R, X_AXIS3, x);
+        R = RotateMat3(R, Y_AXIS3, y);
         break;
     case EULER_ORDER_YZX:
-        R = MultiplyMat3(RX, MultiplyMat3(RZ, RY));
+        R = RotateMat3(R, X_AXIS3, x);
+        R = RotateMat3(R, Z_AXIS3, z);
+        R = RotateMat3(R, Y_AXIS3, y);
         break;
     case EULER_ORDER_ZXY:
-        R = MultiplyMat3(RY, MultiplyMat3(RX, RZ));
+        R = RotateMat3(R, Y_AXIS3, y);
+        R = RotateMat3(R, X_AXIS3, x);
+        R = RotateMat3(R, Z_AXIS3, z);
         break;
     case EULER_ORDER_ZYX:
-        R = MultiplyMat3(RX, MultiplyMat3(RY, RZ));
+        R = RotateMat3(R, X_AXIS3, x);
+        R = RotateMat3(R, Y_AXIS3, y);
+        R = RotateMat3(R, Z_AXIS3, z);
         break;
     }
 
@@ -193,10 +206,6 @@ Vector3 MultiplyMat3Vect3(Matrix3 mat, Vector3 vect) {
 
 Vector3 GetEulerAnglesMat3(Matrix3 mat, EulerOrder order) {
 
-    if (!IsOrthogonalMat3(mat)) {
-        return ZERO_VECTOR3;
-    }
-
     float a1, a2, a3;
     float R00 = mat.matrix[0][0];
     float R01 = mat.matrix[0][1];
@@ -210,64 +219,34 @@ Vector3 GetEulerAnglesMat3(Matrix3 mat, EulerOrder order) {
 
     switch (order) {
     case EULER_ORDER_XYZ:
-        a2 = asin(fmaxf(fminf(R20, 1.0f), -1.0f));
-        if (!IsZeroF(R20) && !IsZeroF(fabsf(R20) - 1.0f)) {
-            a1 = atan2(-R21, R22);
-            a3 = atan2(-R10, R00);
-        } else {
-            a1 = 0.0f;
-            a3 = atan2(R12, R11);
-        }
+        a1 = atan2(-R12, R22);
+        a2 = asin(fmaxf(fminf(R02, 1.0f), -1.0f));
+        a3 = atan2(-R01, R00);
         break;
     case EULER_ORDER_XZY:
-        a3 = asin(fmaxf(fminf(-R12, 1.0f), -1.0f));
-        if (!IsZeroF(R12) && !IsZeroF(fabsf(R12) - 1.0f)) {
-            a1 = atan2(R22, R21);
-            a2 = atan2(R02, R12);
-        } else {
-            a1 = 0.0f;
-            a2 = atan2(-R20, R10);
-        }
+        a1 = atan2(R21, R11);
+        a3 = asin(fmaxf(fminf(-R01, 1.0f), -1.0f));
+        a2 = atan2(R02, R00);
         break;
     case EULER_ORDER_YXZ:
-        a1 = asin(fmaxf(fminf(-R21, 1.0f), -1.0f));
-        if (!IsZeroF(R21) && !IsZeroF(fabsf(R21) - 1.0f)) {
-            a2 = atan2(R20, R22);
-            a3 = atan2(R01, R11);
-        } else {
-            a2 = 0.0f;
-            a3 = atan2(-R02, R00);
-        }
+        a2 = atan2(R02, R22);
+        a1 = asin(fmaxf(fminf(-R12, 1.0f), -1.0f));
+        a3 = atan2(R10, R11);
         break;
     case EULER_ORDER_YZX:
-        a3 = asin(fmaxf(fminf(R01, 1.0f), -1.0f));
-        if (!IsZeroF(R01) && !IsZeroF(fabsf(R01) - 1.0f)) {
-            a1 = atan2(-R02, R00);
-            a2 = atan2(-R12, R11);
-        } else {
-            a1 = 0.0f;
-            a2 = atan2(R10, R20);
-        }
+        a2 = atan2(-R21, R00);
+        a3 = asin(fmaxf(fminf(R10, 1.0f), -1.0f));
+        a1 = atan2(-R12, R11);
         break;
     case EULER_ORDER_ZXY:
-        a2 = asin(fmaxf(fminf(R10, 1.0f), -1.0f));
-        if (!IsZeroF(R10) && !IsZeroF(fabsf(R10) - 1.0f)) {
-            a1 = atan2(R12, R11);
-            a3 = atan2(R21, R22);
-        } else {
-            a1 = 0.0f;
-            a3 = atan2(-R01, R00);
-        }
+        a3 = atan2(R10, R11);
+        a1 = asin(fmaxf(fminf(-R20, 1.0f), -1.0f));
+        a2 = atan2(R21, R22);
         break;
     case EULER_ORDER_ZYX:
-        a1 = asin(fmaxf(fminf(-R20, 1.0f), -1.0f));
-        if (!IsZeroF(R20) && !IsZeroF(fabsf(R20) - 1.0f)) {
-            a2 = atan2(R21, R22);
-            a3 = atan2(R10, R00);
-        } else {
-            a2 = 0.0f;
-            a3 = atan2(-R01, R11);
-        }
+        a3 = atan2(-R01, R11);
+        a2 = asin(fmaxf(fminf(R21, 1.0f), -1.0f));
+        a1 = atan2(-R20, R22);
         break;
     }
 
@@ -296,9 +275,14 @@ Matrix3 OrthonormalizeMat3(Matrix3 mat) {
         return mat;
     }
 
-    Vector3 v1 = (Vector3) {mat.matrix[0][0], mat.matrix[1][0], mat.matrix[2][0]};
-    Vector3 v2 = (Vector3) {mat.matrix[0][1], mat.matrix[1][1], mat.matrix[2][1]};
-    Vector3 v3 = (Vector3) {mat.matrix[0][2], mat.matrix[1][2], mat.matrix[2][2]};
+    Vector3 *cols = GetMat3Columns(mat);
+    if (cols == NULL) {
+        return ZERO_MAT3;
+    }
+    Vector3 v1 = *cols;
+    Vector3 v2 = *(cols+1);
+    Vector3 v3 = *(cols+2);
+    free(cols);
     
     Vector3 u2 = AddVect3(v2, InverseVect3(ProjectVect3(v2, v1)));
     Vector3 u3 = AddVect3(v3, InverseVect3(ProjectVect3(v3, v1)));
@@ -331,6 +315,11 @@ Matrix3 ScaleMat3(Matrix3 mat, Vector3 scale) {
     scalv = AddMat3(scalv, Mat3FromVect3(ZERO_VECTOR3, ZERO_VECTOR3, MultiplyVect3Scalar(Z_AXIS3, scale.z)));
 
     return MultiplyMat3(mat, scalv);
+}
+
+Matrix3 ScalarMat3(float k) {
+
+    return MultiplyMat3Scalar(IDENTITY_MAT3, k);
 }
 
 
@@ -369,6 +358,18 @@ float GetAngleMat3(Matrix3 mat) {
     }
 
     return acos((TraceMat3(mat)-1)*0.5f);
+}
+
+float CharPolMat3(Matrix3 mat, float x) {
+
+    return DeterminantMat3(AddMat3(ScalarMat3(x), AdditiveInverseMat3(mat)));
+}
+
+
+float *GetEigenValMat3(Matrix3 mat) {
+
+    float trace = TraceMat3(mat);
+    return GetRootsPol3(-trace, 0.5f*(trace*trace - TraceMat3(MultiplyMat3(mat, mat))), -DeterminantMat3(mat));
 }
 
 

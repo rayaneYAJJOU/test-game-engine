@@ -41,6 +41,10 @@ Quaternion MultiplyQuatScalar(Quaternion quat, float k) {
 
 Quaternion MultiplyQuat(Quaternion quat1, Quaternion quat2) {
 
+    if (EqualQuat(quat1, IDENTITY_QUAT) || EqualQuat(quat2, IDENTITY_QUAT)) {
+        return (EqualQuat(quat1, IDENTITY_QUAT)) ? quat2 : quat1;
+    }
+
     float x1 = quat1.x;
     float y1 = quat1.y;
     float z1 = quat1.z;
@@ -51,10 +55,10 @@ Quaternion MultiplyQuat(Quaternion quat1, Quaternion quat2) {
     float w2 = quat2.w;
 
     return (Quaternion) {
-        w1*w2 - x1*x2 - y1*y2 - z1*z2,
         w1*x2 + x1*w2 + y1*z2 - z1*y1,
         w1*y2 - x1*z2 + y1*w2 + z1*x2,
-        w1*z2 + x1*y2 - y1*x2 + z1*w2
+        w1*z2 + x1*y2 - y1*x2 + z1*w2,
+        w1*w2 - x1*x2 - y1*y2 - z1*z2
     };
 }
 
@@ -72,6 +76,8 @@ Quaternion InverseQuat(Quaternion quat) {
 
     if (IsZeroQuat(quat)) {
         return ZERO_QUAT;
+    } else if (IsNormalizedQuat(quat)) {
+        return ConjugateQuat(quat);
     }
     return MultiplyQuatScalar(ConjugateQuat(quat), 1/MagnitudeSquaredQuat(quat));
 }
@@ -84,9 +90,64 @@ Quaternion NormalizedQuat(Quaternion quat) {
     return MultiplyQuatScalar(quat, 1/MagnitudeQuat(quat));
 }
 
-Quaternion GetRotationQuat(Vector3 axis, float angle) {
+Quaternion RotationQuat(Vector3 axis, float angle) {
 
-    return AddQuat(FromScalarQuat(cos(angle/2)),FromVect3Quat(MultiplyVect3Scalar(axis, sin(angle/2))));
+    if (!IsNormalizedVect3(axis)) {
+        return ZERO_QUAT;
+    }
+
+    float s = sin(angle/2);
+
+    return (Quaternion) {
+        s*axis.x,
+        s*axis.y,
+        s*axis.z,
+        cos(angle/2)
+    };
+}
+
+Quaternion GetQuatMat3(Matrix3 mat) {
+
+    if (!IsOrthogonalMat3(mat)) {
+        return ZERO_QUAT;
+    }
+
+    Vector3 *cols = GetMat3Columns(mat);
+    Vector3 RX = *cols;
+    Vector3 RY = *(cols+1);
+    Vector3 RZ = *(cols+2);
+    free(cols);
+
+    float *eig = GetEigenValMat3(mat);
+
+    if (eig == NULL) {
+        return ZERO_QUAT;
+    }
+
+    float lambda = *eig;
+    free(eig);
+
+    RX.x -= lambda;
+    RY.y -= lambda;
+    RY = AddVect3(RY, MultiplyVect3Scalar(InverseVect3(RX), RY.x/RX.x));
+    Vector3 vect = X_AXIS3;
+    vect.y = -RY.z / RY.y;
+    vect.x = -(RX.y * vect.y + RX.z * vect.z) / RX.x;
+
+    if (IsZeroVect3(vect)) {
+        return ZERO_QUAT;
+    }
+
+    return RotationQuat(NormalizedVect3(vect), GetAngleMat3(mat));
+}
+
+Quaternion RotateQuat(Quaternion quat, Vector3 axis, float angle) {
+
+    if (!IsNormalizedVect3(axis)) {
+        return ZERO_QUAT;
+    }
+
+    return MultiplyQuat(RotationQuat(axis, angle), quat);
 }
 
 Quaternion FromEulerAnglesQuat(Vector3 eulerAngles, EulerOrder order) {
@@ -95,30 +156,39 @@ Quaternion FromEulerAnglesQuat(Vector3 eulerAngles, EulerOrder order) {
     float y = eulerAngles.y;
     float z = eulerAngles.z;
 
-    Quaternion quatx = GetRotationQuat(X_AXIS3, x);
-    Quaternion quaty = GetRotationQuat(Y_AXIS3, y);
-    Quaternion quatz = GetRotationQuat(Z_AXIS3, z);
-    Quaternion quat = ZERO_QUAT;
+    Quaternion quat = IDENTITY_QUAT;
 
     switch (order)
     {
     case EULER_ORDER_XYZ:
-        quat = MultiplyQuat(quatz, MultiplyQuat(quaty, quatx));
+        quat = RotateQuat(quat, Z_AXIS3, z);
+        quat = RotateQuat(quat, Y_AXIS3, y);
+        quat = RotateQuat(quat, X_AXIS3, x);
         break;
     case EULER_ORDER_XZY:
-        quat = MultiplyQuat(quaty, MultiplyQuat(quaty, quatx));
+        quat = RotateQuat(quat, Y_AXIS3, y);
+        quat = RotateQuat(quat, Z_AXIS3, z);
+        quat = RotateQuat(quat, X_AXIS3, x);
         break;
     case EULER_ORDER_YXZ:
-        quat = MultiplyQuat(quatz, MultiplyQuat(quatx, quaty));
+        quat = RotateQuat(quat, Z_AXIS3, z);
+        quat = RotateQuat(quat, X_AXIS3, x);
+        quat = RotateQuat(quat, Y_AXIS3, y);
         break;
     case EULER_ORDER_YZX:
-        quat = MultiplyQuat(quatx, MultiplyQuat(quatz, quaty));
+        quat = RotateQuat(quat, X_AXIS3, x);
+        quat = RotateQuat(quat, Z_AXIS3, z);
+        quat = RotateQuat(quat, Y_AXIS3, y);
         break;
     case EULER_ORDER_ZXY:
-        quat = MultiplyQuat(quaty, MultiplyQuat(quatx, quatz));
+        quat = RotateQuat(quat, Y_AXIS3, y);
+        quat = RotateQuat(quat, X_AXIS3, x);
+        quat = RotateQuat(quat, Z_AXIS3, z);
         break;
     case EULER_ORDER_ZYX:
-        quat = MultiplyQuat(quatx, MultiplyQuat(quaty, quatz));
+        quat = RotateQuat(quat, X_AXIS3, x);
+        quat = RotateQuat(quat, Y_AXIS3, y);
+        quat = RotateQuat(quat, Z_AXIS3, z);
         break;
     }
 
@@ -161,13 +231,19 @@ Quaternion MultiplyQuatVector3(Quaternion quat, Vector3 vect) {
     return MultiplyQuat(quat, FromVect3Quat(vect));
 }
 
+/** Multiply a Vector3 by a Quaternion
+ * Does stuff
+ * @param Vector3 vect
+ * @param Quaternion quat
+ * @return Quaternion
+*/
 Quaternion MultiplyVect3Quat(Vector3 vect, Quaternion quat) {
 
     return MultiplyQuat(FromVect3Quat(vect), quat);
 }
 
-
-Matrix4 GetMatrix4Quat(Quaternion quat) {
+// Get a (non-unique) Matrix4 From Quaternion quat
+Matrix4 GetMat4Quat(Quaternion quat) {
 
     float x = quat.x;
     float y = quat.y;
@@ -181,58 +257,26 @@ Matrix4 GetMatrix4Quat(Quaternion quat) {
     }};
 }
 
+// Get a Matrix3 From Quaternion quat
+Matrix3 GetMat3Quat(Quaternion quat) {
 
-Vector3 GetEulerAnglesQuat(Quaternion quat, EulerOrder order) {
-
-    if (!IsNormalizedQuat(quat)) {
-        return ZERO_VECTOR3;
-    }
-
-    float a1, a2, a3;
     float x = quat.x;
     float y = quat.y;
     float z = quat.z;
     float w = quat.w;
+    float s = q_rsqrt(MagnitudeSquaredQuat(quat));
+    s *= s;
+    return (Matrix3) {{
+        {1 - 2*s*(y*y + z*z), 2*s*(x*y - z*w), 2*s*(x*z + y*w)},
+        {2*s*(x*y + z*w), 1 - 2*s*(x*x + z*z), 2*s*(y*z - x*w)},
+        {2*s*(x*z - y*w), 2*s*(y*z + x*w), 1 - 2*s*(x*x + y*y)}
+    }};
+}
 
-    switch (order) {
-    case EULER_ORDER_XYZ:
-        a1 = atan2(2 * (w * x + y * z), 1 - 2 * (x * x + y * y));
-        a2 = asin(fmaxf(fminf(2 * (w * y - z * x), 1.0f), -1.0f));
-        a3 = atan2(2 * (w * z + x * y), 1 - 2 * (y * y + z * z));
-        break;
-    case EULER_ORDER_XZY:
-        a1 = atan2(2 * (w * x - z * y), 1 - 2 * (x * x + z * z));
-        a2 = asin(fmaxf(fminf(2 * (w * y + x * z), 1.0f), -1.0f));
-        a3 = atan2(2 * (w * z + y * x), 1 - 2 * (x * x + y * y));
-        break;
-    case EULER_ORDER_YXZ:
-        a1 = atan2(2 * (w * y + z * x), 1 - 2 * (y * y + z * z));
-        a2 = asin(fmaxf(fminf(2 * (w * x - y * z), 1.0f), -1.0f));
-        a3 = atan2(2 * (w * z + y * x), 1 - 2 * (x * x + y * y));
-        break;
-    case EULER_ORDER_YZX:
-        a1 = atan2(2 * (w * y - x * z), 1 - 2 * (y * y + z * z));
-        a2 = asin(fmaxf(fminf(2 * (w * x + y * z), 1.0f), -1.0f));
-        a3 = atan2(2 * (w * z + x * y), 1 - 2 * (x * x + y * y));
-        break;
-    case EULER_ORDER_ZXY:
-        a1 = atan2(2 * (w * z + x * y), 1 - 2 * (x * x + z * z));
-        a2 = asin(fmaxf(fminf(2 * (w * x - y * z), 1.0f), -1.0f));
-        a3 = atan2(2 * (w * y + z * x), 1 - 2 * (y * y + z * z));
-        break;
-    case EULER_ORDER_ZYX:
-        a1 = atan2(2 * (w * z - y * x), 1 - 2 * (x * x + y * y));
-        a2 = asin(fmaxf(fminf(2 * (w * x + z * y), 1.0f), -1.0f));
-        a3 = atan2(2 * (w * y + x * z), 1 - 2 * (x * x + z * z));
-        break;
-    default:
-        a1 = atan2(2 * (w * x + y * z), 1 - 2 * (x * x + y * y));
-        a2 = asin(fmaxf(fminf(2 * (w * y - z * x), 1.0f), -1.0f));
-        a3 = atan2(2 * (w * z + x * y), 1 - 2 * (y * y + z * z));
-        break;
-    }
 
-    return (Vector3) {a1, a2, a3};
+Vector3 GetEulerAnglesQuat(Quaternion quat, EulerOrder order) {
+
+    return GetEulerAnglesMat3(GetMat3Quat(quat), order);
 }
 
 
@@ -244,14 +288,12 @@ Vector3 GetVect3PartQuat(Quaternion quat) {
 
 Vector3 RotateVect3Quat(Vector3 vect, Vector3 axis, float angle) {
 
-    Vector3 axisNormalized = NormalizedVect3(axis);
-
-    if (IsZeroVect3(axisNormalized)) {
+    if (!IsNormalizedVect3(axis)) {
         return ZERO_VECTOR3;
     }
 
     Quaternion p = FromVect3Quat(vect);
-    Quaternion q = AddQuat(MultiplyQuatScalar(IDENTITY_QUAT, cos(angle/2)), MultiplyQuatScalar(FromVect3Quat(axisNormalized), sin(angle/2)));
+    Quaternion q = RotationQuat(axis, angle);
 
     return GetVect3PartQuat(MultiplyQuat(q, MultiplyQuat(p, InverseQuat(q))));
 }
@@ -269,7 +311,7 @@ Vector3 GetAxisQuat(Quaternion quat) {
 
 float DotProductQuat(Quaternion quat1, Quaternion quat2) {
 
-    return quat1.x*quat2.x, quat1.y*quat2.y, quat1.z*quat2.z, quat1.w*quat2.w;
+    return quat1.x*quat2.x + quat1.y*quat2.y + quat1.z*quat2.z + quat1.w*quat2.w;
 }
 
 float AngleQuat(Quaternion quat1, Quaternion quat2) {
